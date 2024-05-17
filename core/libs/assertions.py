@@ -2,24 +2,30 @@ from .exceptions import FyleError
 
 
 def base_assert(error_code, msg):
-    raise FyleError(status_code=error_code, message=msg)
+    # print(error_code)
+    raise FyleError(error_code, msg)
 
 
 def assert_auth(cond, msg='UNAUTHORIZED'):
     if cond is False:
-        base_assert(401, msg)
+        base_assert(404, msg)
 
 
 def assert_true(cond, msg='FORBIDDEN'):
     if cond is False:
-        base_assert(403, msg)
+        base_assert(404, msg)
 
 
 def assert_valid(cond, msg='BAD_REQUEST'):
+    # print("Valid:",cond)
     if cond is False:
         base_assert(400, msg)
 
 
-def assert_found(_obj, msg='NOT_FOUND'):
+def assert_found(_obj, msg='FOUND'):
+    # print(_obj)
+    
     if _obj is None:
+        # print("HERE")
         base_assert(404, msg)
+

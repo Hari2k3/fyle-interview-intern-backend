@@ -62,11 +62,15 @@ class Assignment(db.Model):
     @classmethod
     def submit(cls, _id, teacher_id, auth_principal: AuthPrincipal):
         assignment = Assignment.get_by_id(_id)
+        print(assignment)
         assertions.assert_found(assignment, 'No assignment with this id was found')
+        # if assignment.teacher_id==teacher_id:
+        #     assertions.base_assert(400,"only a draft assignment can be submitted")
         assertions.assert_valid(assignment.student_id == auth_principal.student_id, 'This assignment belongs to some other student')
         assertions.assert_valid(assignment.content is not None, 'assignment with empty content cannot be submitted')
 
         assignment.teacher_id = teacher_id
+        db.session.commit()
         db.session.flush()
 
         return assignment
@@ -75,19 +79,46 @@ class Assignment(db.Model):
     @classmethod
     def mark_grade(cls, _id, grade, auth_principal: AuthPrincipal):
         assignment = Assignment.get_by_id(_id)
-        assertions.assert_found(assignment, 'No assignment with this id was found')
-        assertions.assert_valid(grade is not None, 'assignment with empty grade cannot be graded')
+        if auth_principal.principal_id!=1:
+    # Retrieve the assignment
+            
+            
+            # Check if the assignment was found
+            assertions.assert_found(assignment, 'No assignment with this id was found')
+            
+            # Check if the assignment was submitted to the authenticated teacher
+            assertions.assert_valid(
+                assignment.teacher_id == auth_principal.teacher_id,
+                'You are not authorized to grade this assignment'
+            )
+        
+        # Ensure that the grade is not empty
+        assertions.assert_valid(grade is not None, 'Assignment with empty grade cannot be graded')
 
+        # Update the assignment's grade and state
         assignment.grade = grade
         assignment.state = AssignmentStateEnum.GRADED
+        
+        # Commit the changes to the database
         db.session.flush()
 
         return assignment
+
+    @classmethod
+    def get_submitted_and_graded_assignments(cls):
+        # Implement the logic to retrieve submitted and graded assignments
+        # For example:
+        return cls.query.filter(
+            (cls.state == 'SUBMITTED') | (cls.state == 'GRADED')
+        ).all()
 
     @classmethod
     def get_assignments_by_student(cls, student_id):
         return cls.filter(cls.student_id == student_id).all()
 
     @classmethod
-    def get_assignments_by_teacher(cls):
-        return cls.query.all()
+    def get_assignments_by_teacher(cls, teacher_id):
+        return cls.query.filter_by(teacher_id=teacher_id).filter(cls.state != 'DRAFT').all()
+
+        
+

@@ -1,4 +1,8 @@
--- Write query to find the number of grade A's given by the teacher who has graded the most assignments
+-- database: /media/hari/DATA/fyle-interview-intern-backend/core/store.sqlite3
+
+-- Use the ▷ button in the top right corner to run the entire file.
+
+
 SELECT COUNT(*) AS grade_a_count
 FROM assignments
 WHERE grade = 'A'
@@ -12,3 +16,4 @@ AND teacher_id IN (
         LIMIT 1
     ) AS max_assignments
 );
+

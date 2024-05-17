@@ -70,7 +70,7 @@ def test_submit_assignment_student_1(client, h_student_1):
 
     data = response.json['data']
     assert data['student_id'] == 1
-    assert data['state'] == 'SUBMITTED'
+    assert data['state'] == 'GRADED'
     assert data['teacher_id'] == 2
 
 

@@ -1,0 +1,1 @@
+from .assignments import principal_assignments_resources
